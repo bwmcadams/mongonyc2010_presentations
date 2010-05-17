@@ -1,0 +1,293 @@
+
+\documentclass{beamer}
+
+% Copyright 2010 by Brendan W. McAdams <bwmcadams@gmail.com>
+%
+% You may redistribute the content of this presentation for your own needs 
+% provided you give credit to it's author. In other words: ``Don't be a dick.''
+% % Latex code based upon the ``Generic Presentation 15-45 minutes'' template from Beamer.
+
+
+\mode<presentation>
+{
+  %\usetheme{nouvelle}
+  \usetheme{Hannover}
+  %\usetheme{Warsaw}
+  %\usetheme[pageofpages=of, % word b/w current and total page count
+  %          alternativetitlepage=true, % Fancy title page
+  %          titlepagelogo=mongodb-logo]{Torino}
+  %\usecolortheme{freewilly}
+  %          
+  %%          
+  \setbeamercovered{transparent}
+}
+
+
+\usepackage[english]{babel}
+% or whatever
+
+\usepackage[latin1]{inputenc}
+% or whatever
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+% Or whatever. Note that the encoding and the font should match. If T1
+% does not look nice, try deleting the line with the fontenc.
+
+
+\title[Java Development with MongoDB] % (optional, use only with long paper titles)
+{Java Development with MongoDB}
+
+%\subtitle
+%{Presentation Subtitle} % (optional)
+
+\author[Brendan W. McAdams] 
+{Brendan W. McAdams\\
+%{\scriptsize @rit ({\bf twitter}) }
+}
+% - Use the \inst{?} command only if the authors have different
+%   affiliation.
+
+\institute[Novus Partners, Inc.] % (optional, but mostly needed)
+{ Novus Partners, Inc.\\
+  http://novus.com }
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[Mongo NYC, May 2010] % (optional)
+{May 2010 / Mongo NYC}
+
+\subject{MongoDB Java Development}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+\logo{\includegraphics[width=1.5cm]{novus-logo}}
+
+
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each subsection:
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Outline}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+\beamerdefaultoverlayspecification{<+->}
+
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents
+  % You might wish to add the option [pausesections]
+\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+\section{MongoDB + Java Basics}
+
+\subsection[Getting Started]{Setting up your Java environment}
+
+\begin{frame}{Adding the MongoDB Driver To Your Project}
+ 
+  Assuming you're using a dependency manager, make setup simple\dots
+  \begin{itemize}
+    \pause
+  \item
+       Maven Dependency\\
+      \texttt{\scriptsize
+       <dependency>\\
+        <groupId>org.mongodb</groupId>\\
+        <artifactId>mongo-java-driver</artifactId>\\
+        <version>1.4</version>\\
+      </dependency>}
+  \item
+      Ivy Dependency\\
+      \texttt{\scriptsize <dependency org="org.mongodb" name="mongo-java-driver" rev="1.4"/>}
+  \end{itemize}
+\end{frame}
+
+\subsection[Connecting to MongoDB]{Connecting to MongoDB}
+
+\begin{frame}{Simple Connection}
+    Getting connected to MongoDB is simple; 
+    Connections are pooled, so you only need one\dots\\
+    \texttt{\scriptsize import com.mongodb.Mongo;\\ import com.mongodb.DB; }
+    \pause
+    \begin{itemize}
+        \item{\texttt{\scriptsize Mongo m = new Mongo();}}
+        \item{\texttt{\scriptsize Mongo m = new Mongo(``localhost'');}}
+        \item{\texttt{\scriptsize Mongo m = new Mongo(``localhost'', 27017);}}
+        \item{Fetch a Database Handle (lazy)\dots\\
+            \texttt{\scriptsize DB db = m.getDB(``javaDemo'');}} 
+        \item{If you need to authenticate\dots\\
+        \texttt{\scriptsize boolean auth = db.authenticate(``login'', ``password'');}
+        }
+    \end{itemize}
+
+\end{frame}
+
+\section{Working with MongoDB}
+
+\subsection[Collections + Documents]{Collections + Documents}
+
+\begin{frame}{Working with Collections}
+    Collections are MongoDB ``tables''\dots
+    \pause
+    \begin{itemize}
+        \item{List all of the collections in a database\dots \\
+            \texttt{\scriptsize 
+            \begin{tabbing}
+            Set<String> \= colls = db.getCollectionNames();\\
+            for (String s : colls) \{\\
+            \> System.out.println(s);\\
+            \}\\
+            \end{tabbing}
+            }
+        }
+        \item{Get a specific collection (lazy)\dots \\
+            \texttt{\scriptsize 
+            \begin{tabbing}
+            Set<String> \= colls = db.getCollectionNames();\\
+            for (String s : colls) \{\\
+            \> System.out.println(s);\\
+            \}\\
+            \end{tabbing}
+            }
+        }
+        \item{Count the number of documents in a collection\dots \\
+            \texttt{\scriptsize coll.getCount(); }
+        }
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{MongoDB Documents}{BSON}
+    \begin{itemize}
+        \item ``Documents'' are MongoDB's ``rows''. 
+        \item MongoDB's Internal Document representation is '{\bf BSON}'
+        \begin{itemize}
+            \item {\bf BSON} is a binary optimized flavor of {\bf JSON}
+            \item Corrects {\bf JSON}'s inefficiency in string encoding (Base64)
+            \item Supports extras including Regular Expressions, Byte Arrays, DateTimes \& Timestamps, as well as datatypes for Javascript code blocks \& functions.
+            \item Creative Commons licensed.
+            \item {\bf BSON} implementation being split into it's own package in most drivers.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{MongoDB Documents}{From Java: BasicDBObject}
+    \begin{itemize}
+        \item Java representation of {\bf BSON} is the map-like {\bf DBObject} \pause (Java 2.0 driver has a new base class of {\bf BSONObject} related to the {\bf BSON} split-off)
+        \item Easiest way to work with Mongo Documents is BasicDBObject\dots
+            \begin{itemize}
+                \item {\bf BasicDBObject} implements {\bf java.util.LinkedHashMap<String, Object>}
+                \item Mutable object
+                \item Can take a {\bf Map} as a constructor parameter
+                \item Example: 
+                    \texttt{\scriptsize DBObject doc = new BasicDBObject();\\
+                    doc.put(``username'', ``bwmcadams'');\\
+                    doc.put(``password'', ``MongoNYC'');}
+                \item {\em toString} returns a {\bf JSON} serialization.
+            \end{itemize}
+        \item Use {\bf BasicDBList} (implements {\bf java.util.ArrayList<Object>}) to represent Arrays.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{MongoDB Documents}{From Java: BasicDBObjectbuilder}
+    For those who prefer immutability\dots
+    \begin{itemize}
+        \item {\bf BasicDBObjectBuilder} follows the {\em Builder} pattern.
+        \item {\em add()} your keys \& values:\\
+        \texttt{
+            \tiny
+            BasicDBObjectBuilder builder = BasicDBObjectBuilder.start();\\
+            builder.add(``username'', ``bwmcadams'');\\
+            builder.add(``password'', ``MongoNYC'');\\
+            builder.add(``presentation'', ``Java Development with MongoDB'');
+        }
+        \item A {\bf BasicDBObjectBuilder} is not a {\bf DBObject}. 
+        \item Call {\em get()} to return the built-up {\bf DBObject}.
+        \item {\em add()} returns itself so you can chain calls instead: \texttt{\tiny BasicDBOBjectBuilder.start().add(``username'', ``bwmcadams'').add(``password'', ``MongoNYC'').add(``presentation'', ``Java Development with MongoDB'').get();}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{MongoDB Documents}{Implementation by Extension: DBObject}
+    \begin{itemize}
+        \item If you want to create your own concrete objects, extend \& implement {\bf DBObject}
+            \begin{itemize}
+                \item Requires you implement a map-like interface including ability to get \& set fields by key (even if you don't use them, required to deserialize)
+                \item Instances of {\bf DBObject} can be saved directly to MongoDB.
+            \end{itemize}
+        \item Feeling Fancy? Reflect instead\dots
+            \begin{itemize}
+                \item Use {\bf ReflectionDBObject} as a base class for your {\em Beans}.
+                \item {\bf ReflectionDBObject} uses reflection to proxy your getters \& setters and behave like a DBObject.
+                \item Downside: With Java's single inheritance you are stuck using this as your base class.
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\subsection[Inserting Documents to MongoDB]{Inserting Documents to MongoDB}
+
+\begin{frame}{Inserting Documents}
+    \begin{itemize}
+        \item One at a time:\\
+            \texttt{\tiny DBObject doc = BasicDBOBjectBuilder.start().add(``username'', ``bwmcadams'').add(``password'', ``MongoNYC'').add(``presentation'', ``Java Development with MongoDB'').get();\\
+            // DBCollection coll\\
+            coll.insert(doc);\\
+            }
+        \item Got multiple documents? Call {\em insert()} in a loop, or pass {\bf DBObject[]} or {\bf List<DBObject>}
+        \item Three ways to store your documents:
+        \begin{itemize}
+            \item {\sc Insert} - <{\em insert()}> always attempts to add a new row.
+            \item {\sc Save} - <{\em save()}> only attempts to insert unless {\em \_id} is defined.  Otherwise, it will attempt to update the identified document.
+            \item {\sc Update} - <{\em update()}> Allows you to pass a query to filter by and the fields to change.  Boolean option ``multi'' specifies if multiple documents should be updated.  Boolean ``upsert'' specifies that the object should be inserted if it doesn't exist (e.g. query doesn't match).
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\subsection[Querying MongoDB]{Querying MongoDB}
+
+\begin{frame}{MongoDB Querying}{Implementation by Extension: DBObject}
+    \begin{itemize}
+        \item Find a single row with {\em findOne()}.  Takes the first row returned.
+        \item{Getting a cursor of all documents ({\em find()} with no query):\\ 
+            \texttt{\scriptsize 
+                \begin{tabbing}
+                DBCursor \= cur = coll.find();\\
+                while (cur.hasNext()) \{\\
+                \> System.out.println(cur.next());\\
+                \}\\
+            \end{tabbing}
+            }}
+    \end{itemize}
+\end{frame}
+
+\end{document}
+
+
