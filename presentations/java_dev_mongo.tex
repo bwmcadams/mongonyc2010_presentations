@@ -4,15 +4,15 @@
 % Copyright 2010 by Brendan W. McAdams <bwmcadams@gmail.com>
 %
 % You may redistribute the content of this presentation for your own needs 
-% provided you give credit to it's author. In other words: ``Don't be a dick.''
+% provided you give credit to its author. In other words: ``Don't be a dick.''
 % % Latex code based upon the ``Generic Presentation 15-45 minutes'' template from Beamer.
 
 
 \mode<presentation>
 {
   %\usetheme{nouvelle}
-  \usetheme{Hannover}
-  %\usetheme{Warsaw}
+  %\usetheme{Hannover}
+  \usetheme{Warsaw}
   %\usetheme[pageofpages=of, % word b/w current and total page count
   %          alternativetitlepage=true, % Fancy title page
   %          titlepagelogo=mongodb-logo]{Torino}
@@ -195,7 +195,7 @@
             \item Corrects {\bf JSON}'s inefficiency in string encoding (Base64)
             \item Supports extras including Regular Expressions, Byte Arrays, DateTimes \& Timestamps, as well as datatypes for Javascript code blocks \& functions.
             \item Creative Commons licensed.
-            \item {\bf BSON} implementation being split into it's own package in most drivers.
+            \item {\bf BSON} implementation being split into its own package in most drivers.
         \end{itemize}
     \end{itemize}
 \end{frame}
@@ -249,6 +249,12 @@
                 \item {\bf ReflectionDBObject} uses reflection to proxy your getters \& setters and behave like a DBObject.
                 \item Downside: With Java's single inheritance you are stuck using this as your base class.
             \end{itemize}
+        \item Existing Object Model? ORM-Like Solutions (\textsl{Detailed later})\dots
+            \begin{itemize}
+                \item Daybreak 
+                \item Morphia
+            \end{itemize}
+              
     \end{itemize}
 \end{frame}
 
@@ -264,9 +270,9 @@
         \item Got multiple documents? Call {\em insert()} in a loop, or pass {\bf DBObject[]} or {\bf List<DBObject>}
         \item Three ways to store your documents:
         \begin{itemize}
-            \item {\sc Insert} - <{\em insert()}> always attempts to add a new row.
-            \item {\sc Save} - <{\em save()}> only attempts to insert unless {\em \_id} is defined.  Otherwise, it will attempt to update the identified document.
-            \item {\sc Update} - <{\em update()}> Allows you to pass a query to filter by and the fields to change.  Boolean option ``multi'' specifies if multiple documents should be updated.  Boolean ``upsert'' specifies that the object should be inserted if it doesn't exist (e.g. query doesn't match).
+            \item {\sc Insert} ({\em insert()}) always attempts to add a new row.
+            \item {\sc Save} ({\em save()}) only attempts to insert unless {\em \_id} is defined.  Otherwise, it will attempt to update the identified document.
+            \item {\sc Update} ({\em update()}) Allows you to pass a query to filter by and the fields to change.  Boolean option ``multi'' specifies if multiple documents should be updated.  Boolean ``upsert'' specifies that the object should be inserted if it doesn't exist (e.g. query doesn't match).
         \end{itemize}
     \end{itemize}
 \end{frame}
