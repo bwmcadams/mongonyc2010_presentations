@@ -83,7 +83,7 @@
 % If you wish to uncover everything in a step-wise fashion, uncomment
 % the following command: 
 
-\beamerdefaultoverlayspecification{<+->}
+%\beamerdefaultoverlayspecification{<+->}
 
 
 \begin{document}
@@ -142,9 +142,9 @@
         \item{\texttt{\scriptsize Mongo m = new Mongo();}}
         \item{\texttt{\scriptsize Mongo m = new Mongo(``localhost'');}}
         \item{\texttt{\scriptsize Mongo m = new Mongo(``localhost'', 27017);}}
-        \item{Fetch a Database Handle (lazy)\dots\\
+        \item<3->{Fetch a Database Handle (lazy)\dots\\
             \texttt{\scriptsize DB db = m.getDB(``javaDemo'');}} 
-        \item{If you need to authenticate\dots\\
+        \item<4->{If you need to authenticate\dots\\
         \texttt{\scriptsize boolean auth = db.authenticate(``login'', ``password'');}
         }
     \end{itemize}
@@ -171,12 +171,7 @@
         }
         \item{Get a specific collection (lazy)\dots \\
             \texttt{\scriptsize 
-            \begin{tabbing}
-            Set<String> \= colls = db.getCollectionNames();\\
-            for (String s : colls) \{\\
-            \> System.out.println(s);\\
-            \}\\
-            \end{tabbing}
+            DBCollection coll = db.getCollection(``testData'');
             }
         }
         \item{Count the number of documents in a collection\dots \\
@@ -196,25 +191,26 @@
             \item Supports extras including Regular Expressions, Byte Arrays, DateTimes \& Timestamps, as well as datatypes for Javascript code blocks \& functions.
             \item Creative Commons licensed.
             \item {\bf BSON} implementation being split into its own package in most drivers.
+            \item {\bf bsonspec.org}
         \end{itemize}
     \end{itemize}
 \end{frame}
 
 \begin{frame}{MongoDB Documents}{From Java: BasicDBObject}
     \begin{itemize}
-        \item Java representation of {\bf BSON} is the map-like {\bf DBObject} \pause (Java 2.0 driver has a new base class of {\bf BSONObject} related to the {\bf BSON} split-off)
+        \item Java representation of {\bf BSON} is the map-like {\bf DBObject} (Java 2.0 driver has a new base class of {\bf BSONObject} related to the {\bf BSON} split-off)
         \item Easiest way to work with Mongo Documents is BasicDBObject\dots
             \begin{itemize}
-                \item {\bf BasicDBObject} implements {\bf java.util.LinkedHashMap<String, Object>}
-                \item Mutable object
-                \item Can take a {\bf Map} as a constructor parameter
-                \item Example: 
+                \item<2-> {\bf BasicDBObject} implements {\bf java.util.LinkedHashMap<String, Object>}
+                \item<3-> Mutable object
+                \item<4-> Can take a {\bf Map} as a constructor parameter
+                \item<5-> Example: 
                     \texttt{\scriptsize DBObject doc = new BasicDBObject();\\
                     doc.put(``username'', ``bwmcadams'');\\
                     doc.put(``password'', ``MongoNYC'');}
-                \item {\em toString} returns a {\bf JSON} serialization.
+                \item<6-> {\em toString} returns a {\bf JSON} serialization.
             \end{itemize}
-        \item Use {\bf BasicDBList} (implements {\bf java.util.ArrayList<Object>}) to represent Arrays.
+        \item<7-> Use {\bf BasicDBList} (implements {\bf java.util.ArrayList<Object>}) to represent Arrays.
     \end{itemize}
 \end{frame}
 
@@ -222,7 +218,7 @@
     For those who prefer immutability\dots
     \begin{itemize}
         \item {\bf BasicDBObjectBuilder} follows the {\em Builder} pattern.
-        \item {\em add()} your keys \& values:\\
+        \item<2-> {\em add()} your keys \& values:\\
         \texttt{
             \tiny
             BasicDBObjectBuilder builder = BasicDBObjectBuilder.start();\\
@@ -230,26 +226,26 @@
             builder.add(``password'', ``MongoNYC'');\\
             builder.add(``presentation'', ``Java Development with MongoDB'');
         }
-        \item A {\bf BasicDBObjectBuilder} is not a {\bf DBObject}. 
-        \item Call {\em get()} to return the built-up {\bf DBObject}.
-        \item {\em add()} returns itself so you can chain calls instead: \texttt{\tiny BasicDBOBjectBuilder.start().add(``username'', ``bwmcadams'').add(``password'', ``MongoNYC'').add(``presentation'', ``Java Development with MongoDB'').get();}
+        \item<3-> A {\bf BasicDBObjectBuilder} is not a {\bf DBObject}. 
+        \item<3-> Call {\em get()} to return the built-up {\bf DBObject}.
+        \item<4-> {\em add()} returns itself so you can chain calls instead: \texttt{\tiny BasicDBOBjectBuilder.start().add(``username'', ``bwmcadams'').add(``password'', ``MongoNYC'').add(``presentation'', ``Java Development with MongoDB'').get();}
     \end{itemize}
 \end{frame}
 
 \begin{frame}{MongoDB Documents}{Implementation by Extension: DBObject}
     \begin{itemize}
-        \item If you want to create your own concrete objects, extend \& implement {\bf DBObject}
+        \item<1-> If you want to create your own concrete objects, extend \& implement {\bf DBObject}
             \begin{itemize}
                 \item Requires you implement a map-like interface including ability to get \& set fields by key (even if you don't use them, required to deserialize)
                 \item Instances of {\bf DBObject} can be saved directly to MongoDB.
             \end{itemize}
-        \item Feeling Fancy? Reflect instead\dots
+        \item<2-> Feeling Fancy? Reflect instead\dots
             \begin{itemize}
                 \item Use {\bf ReflectionDBObject} as a base class for your {\em Beans}.
                 \item {\bf ReflectionDBObject} uses reflection to proxy your getters \& setters and behave like a DBObject.
                 \item Downside: With Java's single inheritance you are stuck using this as your base class.
             \end{itemize}
-        \item Existing Object Model? ORM-Like Solutions (\textsl{Detailed later})\dots
+        \item<3-> Existing Object Model? ORM-Like Solutions (\textsl{Detailed later})\dots
             \begin{itemize}
                 \item Daybreak 
                 \item Morphia
@@ -258,17 +254,27 @@
     \end{itemize}
 \end{frame}
 
+\begin{frame}{Briefly: Working with DBObjects}
+    Getting data from DBObjects is relatively simple in Java\ldots
+    \begin{itemize}
+        \item<2-> Check if a field (a.k.a. Key) exists with {\em containsField()}
+        \item<3-> Get a {\bf Set<String>} of a {\bf DBObject}'s field names with {\em keySet()}
+        \item<4-> Get a specific field with {\em get(String key)}.  This returns {\em Object} so you will need to cast to an expected value.
+        \item<5-> Call {\em toMap()} to get back a {\bf Map} (String, Object) instead.
+    \end{itemize}
+\end{frame}
+
 \subsection[Inserting Documents to MongoDB]{Inserting Documents to MongoDB}
 
 \begin{frame}{Inserting Documents}
     \begin{itemize}
-        \item One at a time:\\
+        \item<2-> One at a time:\\
             \texttt{\tiny DBObject doc = BasicDBOBjectBuilder.start().add(``username'', ``bwmcadams'').add(``password'', ``MongoNYC'').add(``presentation'', ``Java Development with MongoDB'').get();\\
             // DBCollection coll\\
             coll.insert(doc);\\
             }
-        \item Got multiple documents? Call {\em insert()} in a loop, or pass {\bf DBObject[]} or {\bf List<DBObject>}
-        \item Three ways to store your documents:
+        \item<3-> Got multiple documents? Call {\em insert()} in a loop, or pass {\bf DBObject[]} or {\bf List<DBObject>}
+        \item<4-> Three ways to store your documents:
         \begin{itemize}
             \item {\sc Insert} ({\em insert()}) always attempts to add a new row.
             \item {\sc Save} ({\em save()}) only attempts to insert unless {\em \_id} is defined.  Otherwise, it will attempt to update the identified document.
@@ -279,18 +285,52 @@
 
 \subsection[Querying MongoDB]{Querying MongoDB}
 
-\begin{frame}{MongoDB Querying}{Implementation by Extension: DBObject}
+\begin{frame}{MongoDB Querying}{Basics}
     \begin{itemize}
         \item Find a single row with {\em findOne()}.  Takes the first row returned.
-        \item{Getting a cursor of all documents ({\em find()} with no query):\\ 
+        \item<2-> Getting a cursor of all documents ({\em find()} with no query):\\ 
             \texttt{\scriptsize 
                 \begin{tabbing}
                 DBCursor \= cur = coll.find();\\
-                while (cur.hasNext()) \{\\
-                \> System.out.println(cur.next());\\
+                while (DBObject doc : cur) \{\\
+                \> System.out.println(doc);\\
                 \}\\
             \end{tabbing}
-            }}
+            }
+        \item<3-> Query for a specific value\ldots  \\
+            \texttt{\scriptsize
+            DBObject q = new BasicDBObjectBuilder.start().add(``username'', ``bwmcadams'').get();
+            DBObject doc = coll.findOne(q); 
+        }
+    \item<4-> You can pass an optional second {\bf DBObject} parameter to {\em find()} and {\em findOne()} which specifies the fields to return. 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{MongoDB Querying}{Query Operators}
+     MongoDB is no mere Key-value store. There are myriad powerful operators to enhance your MongoDB queries\ldots
+    \begin{itemize}{\small
+        \item Conditional Operators: {\bf \$gt} (>), {\bf \$lt} (<), {\bf \$gte (>=)},  {\bf \$lte (<=)}
+        \item Negative Equality: {\bf \$ne} (!=) 
+        \item Array Operators: {\bf \$in} (SQL ``IN'' clause\ldots takes an array), {\bf \$nin} (Opposite of ``IN''), {\bf \$all} (Requires all values in the array match), {\bf \$size} (Match the size of an array)
+        \item Field Defined: {\bf \$exists} (boolean argument)(Great in a schemaless world)
+        \item Regular Expressions (Language dependent - most drivers support it)
+        \item Pass Arbitrary Javascript with {\bf \$where} (No OR statements, so use WHERE for complex range filters)
+        \item Negate any operator with {\bf \$not}
+        }
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{MongoDB Querying}{Putting Operators to Work}
+    Using a query operator requires nested objects\ldots
+    \begin{itemize}
+        \item<2-> All posts since a particular date:\\ \texttt{\small
+            DBObject q = new BasicDBObject(``postDate'', new BasicDBObject(''\$gte``, new java.util.Date()));\\ 
+            DBCursor posts = coll.find(q);\\
+            }
+        \item<3-> Find all posts NOT by me:\\ \texttt{\small
+            DBObject q = new BasicDBObject(``postedBy'', new BasicDBObject(``\$ne'', ``bwmcadams''));\\
+            DBCursor posts = coll.find(q);\\
+        }
     \end{itemize}
 \end{frame}
 
