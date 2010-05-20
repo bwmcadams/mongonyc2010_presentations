@@ -92,3 +92,20 @@
         + IRC: freenode.net #mongodb
     * Shiny
 
+---
+- MySQL Schema
+- SQLAlchemy mapping
+- Sample query code from SQLAlchemy
+
+- MongoDB Schema
+- MongoKit mapping
+- MySQL -> MongoKit migration code
+- Sample query code from MongoKit
+
+---
+- Demonstrate DBRefs vs. embedded (news posts?)
+- Demonstrate Navigation Data
+
+- A bit on MongoKit (upcoming features)
+
+- Questions?
