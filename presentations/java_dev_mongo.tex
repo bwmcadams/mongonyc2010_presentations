@@ -4,15 +4,15 @@
 % Copyright 2010 by Brendan W. McAdams <bwmcadams@gmail.com>
 %
 % You may redistribute the content of this presentation for your own needs 
-% provided you give credit to its author. In other words: ``Don't be a dick.''
-% % Latex code based upon the ``Generic Presentation 15-45 minutes'' template from Beamer.
+% provided you give credit to its author. In other words: "Don't be a dick."
+% % Latex code based upon the "Generic Presentation 15-45 minutes" template from Beamer.
 
 
 \mode<presentation>
 {
   %\usetheme{nouvelle}
   %\usetheme{Hannover}
-  \usetheme{Warsaw}
+  \usetheme{Boadilla}
   %\usetheme[pageofpages=of, % word b/w current and total page count
   %          alternativetitlepage=true, % Fancy title page
   %          titlepagelogo=mongodb-logo]{Torino}
@@ -21,6 +21,23 @@
   %%          
   \setbeamercovered{transparent}
 }
+
+
+\usepackage{hyperref}
+
+
+
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\lstset{language=Java,captionpos=t,tabsize=3,keywordstyle=\color{blue},commentstyle=\color{darkgreen},stringstyle=\color{red},numberstyle=\tiny,numbersep=5pt,breaklines=true,showstringspaces=false,basicstyle=\scriptsize,emph={label}}
+
+
+\usepackage{caption}
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox{black}{\parbox{\textwidth}{#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
 
 
 \usepackage[english]{babel}
@@ -112,42 +129,46 @@
 
 \subsection[Getting Started]{Setting up your Java environment}
 
-\begin{frame}{Adding the MongoDB Driver To Your Project}
+\begin{frame}[fragile]{Adding the MongoDB Driver To Your Project}
  
   Assuming you're using a dependency manager, make setup simple\dots
-  \begin{itemize}
     \pause
-  \item
-       Maven Dependency\\
-      \texttt{\scriptsize
-       <dependency>\\
-        <groupId>org.mongodb</groupId>\\
-        <artifactId>mongo-java-driver</artifactId>\\
-        <version>1.4</version>\\
-      </dependency>}
-  \item
-      Ivy Dependency\\
-      \texttt{\scriptsize <dependency org="org.mongodb" name="mongo-java-driver" rev="1.4"/>}
-  \end{itemize}
+\begin{lstlisting}[caption=Maven Dependency]
+<dependency>
+  <groupId>org.mongodb</groupId>
+  <artifactId>mongo-java-driver</artifactId>
+  <version>1.4</version>
+</dependency>
+\end{lstlisting}
+\begin{lstlisting}[caption=Ivy Dependency]
+<dependency org="org.mongodb" 
+            name="mongo-java-driver" 
+            rev="1.4"/>
+\end{lstlisting}
 \end{frame}
 
 \subsection[Connecting to MongoDB]{Connecting to MongoDB}
 
-\begin{frame}{Simple Connection}
+\begin{frame}[fragile]{Simple Connection}
     Getting connected to MongoDB is simple; 
     Connections are pooled, so you only need one\dots\\
-    \texttt{\scriptsize import com.mongodb.Mongo;\\ import com.mongodb.DB; }
-    \pause
-    \begin{itemize}
-        \item{\texttt{\scriptsize Mongo m = new Mongo();}}
-        \item{\texttt{\scriptsize Mongo m = new Mongo(``localhost'');}}
-        \item{\texttt{\scriptsize Mongo m = new Mongo(``localhost'', 27017);}}
-        \item<3->{Fetch a Database Handle (lazy)\dots\\
-            \texttt{\scriptsize DB db = m.getDB(``javaDemo'');}} 
-        \item<4->{If you need to authenticate\dots\\
-        \texttt{\scriptsize boolean auth = db.authenticate(``login'', ``password'');}
-        }
-    \end{itemize}
+\begin{lstlisting} 
+import com.mongodb.Mongo;
+import com.mongodb.DB;
+Mongo m = new Mongo();
+Mongo m = new Mongo("localhost");
+Mongo m = new Mongo("localhost", 27017);
+\end{lstlisting}
+\pause
+Fetch a Database Handle (lazy)\dots
+\begin{lstlisting}
+DB db = m.getDB("javaDemo");
+\end{lstlisting}
+\pause
+If you need to authenticate\dots
+\begin{lstlisting}
+boolean auth = db.authenticate("login", "password");
+\end{lstlisting}
 
 \end{frame}
 
@@ -155,35 +176,31 @@
 
 \subsection[Collections + Documents]{Collections + Documents}
 
-\begin{frame}{Working with Collections}
-    Collections are MongoDB ``tables''\dots
+\begin{frame}[fragile]{Working with Collections}
+    Collections are MongoDB "tables"\dots
     \pause
     \begin{itemize}
         \item{List all of the collections in a database\dots \\
-            \texttt{\scriptsize 
-            \begin{tabbing}
-            Set<String> \= colls = db.getCollectionNames();\\
-            for (String s : colls) \{\\
-            \> System.out.println(s);\\
-            \}\\
-            \end{tabbing}
-            }
-        }
+\begin{lstlisting}
+Set<String> = colls = db.getCollectionNames();
+for (String s : colls) {
+    System.out.println(s);
+}
+\end{lstlisting}
         \item{Get a specific collection (lazy)\dots \\
-            \texttt{\scriptsize 
-            DBCollection coll = db.getCollection(``testData'');
-            }
-        }
+\begin{lstlisting}
+DBCollection coll = db.getCollection("testData");
+\end{lstlisting}
         \item{Count the number of documents in a collection\dots \\
-            \texttt{\scriptsize coll.getCount(); }
-        }
-
+\begin{lstlisting}
+coll.getCount(); 
+\end{lstlisting}
     \end{itemize}
 \end{frame}
 
 \begin{frame}{MongoDB Documents}{BSON}
     \begin{itemize}
-        \item ``Documents'' are MongoDB's ``rows''. 
+        \item "Documents" are MongoDB's "rows". 
         \item MongoDB's Internal Document representation is '{\bf BSON}'
         \begin{itemize}
             \item {\bf BSON} is a binary optimized flavor of {\bf JSON}
@@ -196,7 +213,7 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{MongoDB Documents}{From Java: BasicDBObject}
+\begin{frame}[fragile]{MongoDB Documents}{From Java: BasicDBObject}
     \begin{itemize}
         \item Java representation of {\bf BSON} is the map-like {\bf DBObject} (Java 2.0 driver has a new base class of {\bf BSONObject} related to the {\bf BSON} split-off)
         \item Easiest way to work with Mongo Documents is BasicDBObject\dots
@@ -205,30 +222,34 @@
                 \item<3-> Mutable object
                 \item<4-> Can take a {\bf Map} as a constructor parameter
                 \item<5-> Example: 
-                    \texttt{\scriptsize DBObject doc = new BasicDBObject();\\
-                    doc.put(``username'', ``bwmcadams'');\\
-                    doc.put(``password'', ``MongoNYC'');}
+                \begin{lstlisting}
+DBObject doc = new BasicDBObject();
+doc.put("username", "bwmcadams");
+doc.put("password", "MongoNYC");
+                \end{lstlisting}
                 \item<6-> {\em toString} returns a {\bf JSON} serialization.
             \end{itemize}
         \item<7-> Use {\bf BasicDBList} (implements {\bf java.util.ArrayList<Object>}) to represent Arrays.
     \end{itemize}
 \end{frame}
 
-\begin{frame}{MongoDB Documents}{From Java: BasicDBObjectbuilder}
+\begin{frame}[fragile]{MongoDB Documents}{From Java: BasicDBObjectbuilder}
     For those who prefer immutability\dots
     \begin{itemize}
         \item {\bf BasicDBObjectBuilder} follows the {\em Builder} pattern.
         \item<2-> {\em add()} your keys \& values:\\
-        \texttt{
-            \tiny
-            BasicDBObjectBuilder builder = BasicDBObjectBuilder.start();\\
-            builder.add(``username'', ``bwmcadams'');\\
-            builder.add(``password'', ``MongoNYC'');\\
-            builder.add(``presentation'', ``Java Development with MongoDB'');
-        }
+\begin{lstlisting}
+BasicDBObjectBuilder builder = BasicDBObjectBuilder.start();
+builder.add("username", "bwmcadams");
+builder.add("password", "MongoNYC");
+builder.add("presentation", "Java Development with MongoDB");
+\end{lstlisting}
         \item<3-> A {\bf BasicDBObjectBuilder} is not a {\bf DBObject}. 
         \item<3-> Call {\em get()} to return the built-up {\bf DBObject}.
-        \item<4-> {\em add()} returns itself so you can chain calls instead: \texttt{\tiny BasicDBOBjectBuilder.start().add(``username'', ``bwmcadams'').add(``password'', ``MongoNYC'').add(``presentation'', ``Java Development with MongoDB'').get();}
+        \item<4-> {\em add()} returns itself so you can chain calls instead: 
+\begin{lstlisting}
+BasicDBOBjectBuilder.start().add("username", "bwmcadams").add("password", "MongoNYC").add("presentation", "Java Development with MongoDB").get();
+\end{lstlisting}
     \end{itemize}
 \end{frame}
 
@@ -245,10 +266,11 @@
                 \item {\bf ReflectionDBObject} uses reflection to proxy your getters \& setters and behave like a DBObject.
                 \item Downside: With Java's single inheritance you are stuck using this as your base class.
             \end{itemize}
-        \item<3-> Existing Object Model? ORM-Like Solutions (\textsl{Detailed later})\dots
+        \item<3-> Existing Object Model? ORM-Like Solutions\ldots
             \begin{itemize}
-                \item Daybreak 
-                \item Morphia
+                \item Morphia (uses JPA-style annotations)
+                \item Daybreak (annotation based)
+                \item Mungbean (more Java-ey query syntax & PoJo Mapping)
             \end{itemize}
               
     \end{itemize}
@@ -266,43 +288,66 @@
 
 \subsection[Inserting Documents to MongoDB]{Inserting Documents to MongoDB}
 
-\begin{frame}{Inserting Documents}
+\begin{frame}[fragile]{Inserting Documents}
     \begin{itemize}
         \item<2-> One at a time:\\
-            \texttt{\tiny DBObject doc = BasicDBOBjectBuilder.start().add(``username'', ``bwmcadams'').add(``password'', ``MongoNYC'').add(``presentation'', ``Java Development with MongoDB'').get();\\
-            // DBCollection coll\\
-            coll.insert(doc);\\
-            }
+\begin{lstlisting}
+DBObject doc = 
+    BasicDBOBjectBuilder.start().
+        add("username", "bwmcadams").
+        add("password", "MongoNYC").
+        add("presentation", "Java Development with MongoDB").
+        get();
+// DBCollection coll
+coll.insert(doc);
+\end{lstlisting}
         \item<3-> Got multiple documents? Call {\em insert()} in a loop, or pass {\bf DBObject[]} or {\bf List<DBObject>}
         \item<4-> Three ways to store your documents:
         \begin{itemize}
             \item {\sc Insert} ({\em insert()}) always attempts to add a new row.
             \item {\sc Save} ({\em save()}) only attempts to insert unless {\em \_id} is defined.  Otherwise, it will attempt to update the identified document.
-            \item {\sc Update} ({\em update()}) Allows you to pass a query to filter by and the fields to change.  Boolean option ``multi'' specifies if multiple documents should be updated.  Boolean ``upsert'' specifies that the object should be inserted if it doesn't exist (e.g. query doesn't match).
+            \item {\sc Update} ({\em update()}) Allows you to pass a query to filter by and the fields to change.  Boolean option "multi" specifies if multiple documents should be updated.  Boolean "upsert" specifies that the object should be inserted if it doesn't exist (e.g. query doesn't match).
         \end{itemize}
     \end{itemize}
 \end{frame}
 
 \subsection[Querying MongoDB]{Querying MongoDB}
 
-\begin{frame}{MongoDB Querying}{Basics}
+\begin{frame}[fragile]{MongoDB Querying}{Basics}
     \begin{itemize}
         \item Find a single row with {\em findOne()}.  Takes the first row returned.
         \item<2-> Getting a cursor of all documents ({\em find()} with no query):\\ 
-            \texttt{\scriptsize 
-                \begin{tabbing}
-                DBCursor \= cur = coll.find();\\
-                while (DBObject doc : cur) \{\\
-                \> System.out.println(doc);\\
-                \}\\
-            \end{tabbing}
-            }
+\begin{lstlisting}
+DBCursor cur = coll.find();
+while (DBObject doc : cur) {
+    System.out.println(doc);
+}
+\end{lstlisting}
         \item<3-> Query for a specific value\ldots  \\
-            \texttt{\scriptsize
-            DBObject q = new BasicDBObjectBuilder.start().add(``username'', ``bwmcadams'').get();
-            DBObject doc = coll.findOne(q); 
-        }
-    \item<4-> You can pass an optional second {\bf DBObject} parameter to {\em find()} and {\em findOne()} which specifies the fields to return. 
+\begin{lstlisting}
+DBObject q = new BasicDBObjectBuilder.
+                 start().
+                 add("username", "bwmcadams").
+                 get();
+DBObject doc = coll.findOne(q); 
+\end{lstlisting}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{MongoDB Querying}{Basics}
+    \begin{itemize}
+        \item You can pass an optional second {\bf DBObject} parameter to {\em find()} and {\em findOne()} which specifies the fields to return. 
+        \item If you have an embedded object (for example, an address object) you can retrieve it with dot notation in the fields list (e.g. {\em "address.city"} retrieves just the city value)
+        \item Use {\em limit()}, {\em skip()} and {\em sort()} on {\bf DBCursor} to adjust your results.  These all return a new {\bf DBCursor}.  
+        \item {\em distinct()} can be used (on {\bf DBCollection} to find all distinct values for a given key; it returns a list:
+            \begin{lstlisting}
+List values = coll.distinct("postedBy"); // contains all distinct values in "postedBy"
+/** Or, limit what you're looking for with a query */
+DBObject q  = new BasicDBObject("postedBy", 
+                  new BasicDBObject("$ne", "bwmcadams")
+              );
+List values = coll.distinct("postedBy", q);
+            \end{lstlisting}
     \end{itemize}
 \end{frame}
 
@@ -311,7 +356,7 @@
     \begin{itemize}{\small
         \item Conditional Operators: {\bf \$gt} (>), {\bf \$lt} (<), {\bf \$gte (>=)},  {\bf \$lte (<=)}
         \item Negative Equality: {\bf \$ne} (!=) 
-        \item Array Operators: {\bf \$in} (SQL ``IN'' clause\ldots takes an array), {\bf \$nin} (Opposite of ``IN''), {\bf \$all} (Requires all values in the array match), {\bf \$size} (Match the size of an array)
+        \item Array Operators: {\bf \$in} (SQL "IN" clause\ldots takes an array), {\bf \$nin} (Opposite of "IN"), {\bf \$all} (Requires all values in the array match), {\bf \$size} (Match the size of an array)
         \item Field Defined: {\bf \$exists} (boolean argument)(Great in a schemaless world)
         \item Regular Expressions (Language dependent - most drivers support it)
         \item Pass Arbitrary Javascript with {\bf \$where} (No OR statements, so use WHERE for complex range filters)
@@ -320,19 +365,135 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{MongoDB Querying}{Putting Operators to Work}
+\begin{frame}[fragile]{MongoDB Querying}{Putting Operators to Work}
     Using a query operator requires nested objects\ldots
     \begin{itemize}
-        \item<2-> All posts since a particular date:\\ \texttt{\small
-            DBObject q = new BasicDBObject(``postDate'', new BasicDBObject(''\$gte``, new java.util.Date()));\\ 
-            DBCursor posts = coll.find(q);\\
-            }
-        \item<3-> Find all posts NOT by me:\\ \texttt{\small
-            DBObject q = new BasicDBObject(``postedBy'', new BasicDBObject(``\$ne'', ``bwmcadams''));\\
-            DBCursor posts = coll.find(q);\\
-        }
+        \item<2-> All posts since a particular date:\\ \begin{lstlisting}
+DBObject q = new BasicDBObject("postDate", 
+                new BasicDBObject("$gte", new java.util.Date())
+            ); 
+DBCursor posts = coll.find(q);
+\end{lstlisting}
+        \item<3-> Find all posts NOT by me:\\ \begin{lstlisting}
+DBObject q = new BasicDBObject("postedBy", 
+                new BasicDBObject("$ne", "bwmcadams")
+            );
+DBCursor posts = coll.find(q);
+\end{lstlisting}
+        \item<4-> No syntactic sugar in Java to make it easier\ldots
+        \item<5-> {\em Mungbean} provides a more fluid query syntax (but isn't very Mongo-ey), if you use it's PoJo mapping.
+        \item<6-> You might also consider evaluating other JVM languages for querying....
+
     \end{itemize}
 \end{frame}
+
+\subsection[Querying MongoDB]{AltJVM Languages - Syntactic Sugar}
+
+\begin{frame}[fragile]{MongoDB Querying}{AltJVM Languages - Syntactic Sugar}
+\begin{semiverbatim}
+\begin{lstlisting}[label=groovy-sample,caption=Groovy Sample]
+def q = [postDate: ["$gte:" new java.util.Date()]
+        ] as BasicDBObject
+def q = [postedBy: ["$ne": "bwmcadams"]
+        ] as BasicDBObject
+
+def posts = coll.find(q)
+\end{lstlisting}
+\end{semiverbatim}
+\end{frame}
+
+\begin{frame}[fragile]{MongoDB Querying}{AltJVM Languages - Syntactic Sugar}
+\begin{semiverbatim}
+\begin{lstlisting}[label=scala-sample,caption=Scala Sample]
+val q = "postDate" $gte new java.util.Date()
+val q = "postedBy" $ne "bwmcadams"
+
+val posts = coll.find(q)
+\end{lstlisting}
+\end{semiverbatim}
+\end{frame}
+
+\begin{frame}[fragile]{MongoDB Querying}{AltJVM Languages - Syntactic Sugar}
+\begin{semiverbatim}
+\begin{lstlisting}[label=jython-sample,caption=Jython Sample]
+q = {"postDate": {"$gte": datetime.datetime.now()}}
+q = {"postedBy": {"$ne": "bwmcadams"}}
+
+posts = coll.find(q)
+\end{lstlisting}
+\end{semiverbatim}
+\end{frame}
+
+\subsection[More Advanced MongoDB]
+
+\begin{frame}[fragile]{Indexes}
+    \small MongoDB Indexes work much like RDBMS indexes\ldots
+    \begin{itemize}
+        \item Create a single-key index:\\ 
+            \begin{lstlisting}
+DBObject idx = new BasicDBObject("postedBy", 1);
+coll.createIndex(idx);
+            \end{lstlisting}
+        This defaults to ascending order (-1 = descending), with a system generated name.
+        \item For a multi-key/compound-key index:
+            \begin{lstlisting}
+DBObject idx = new BasicDBObjectBuilder.start().
+                   add("postedBy", 1).
+                   add("postDate", -1).
+                   get();
+coll.createIndex(idx);
+            \end{lstlisting}
+        This sorts postedBy ascending, but postDate descending.
+
+    \item If you want to index an embedded field, simply use the query dot notation (e.g. "address.city")
+        
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Indexes}{Options}
+    \small MongoDB Indexes work much like RDBMS indexes\ldots
+    \begin{itemize}
+    \item You can pass a second DBObject of options to change the type of index, name, etc:
+            \begin{lstlisting}
+DBObject idx = new BasicDBObject("slug", 1);
+DBObject opts = new BasicDBObject("unique": true);
+coll.createIndex(idx, opts);
+            \end{lstlisting}
+            This will ensure that the "slug" field is unique across all entries.  (A list of complete options is available in the MongoDB Documentation)
+        \item Consider using {\em ensureIndex()} instead of {\em createIndex}.
+    \end{itemize}
+\end{frame}
+
+
+\section{Final Remarks}
+\begin{frame}{Things We Didn't Cover}
+    Things we didn't cover, but you should spend some time exploring\ldots
+    \begin{itemize}
+        \item Map/Reduce (great for more complex aggregation)
+        \item Geospatial indexes and queries
+        \item Aggregation queries such as Group (Which use JavaScript functions)
+        \item Lots more at MongoDB.org \ldots
+    \end{itemize}
+\end{frame}
+\begin{frame}{Contact Info + Where To Learn More}
+    \begin{itemize}
+        \item Contact Me
+        \begin{itemize}
+            \item twitter: {\bf @rit}
+            \item email: {\bf bwmcadams@gmail.com}
+        \end{itemize}
+        \item Pressing Questions?
+        \begin{itemize}
+            \item IRC - {freenode.net \bf\#mongodb}
+            \item MongoDB Users List - \url{http://groups.google.com/group/mongodb-user}
+        \end{itemize}
+    \item Mongo Java Language Center - \url{http://mongodb.org/display/DOCS/Java+Language+Center} {(\tiny Links to Java driver docs, and many of the third party libraries)}
+        \item Morphia - \url{http://code.google.com/p/morphia/}
+        \item Mungbean - \url{http://github.com/jannehietamaki/mungbean}
+        \item Experimental JDBC Driver - \url{http://github.com/erh/mongo-jdbc}
+    \end{itemize}
+\end{frame}
+
 
 \end{document}
 
