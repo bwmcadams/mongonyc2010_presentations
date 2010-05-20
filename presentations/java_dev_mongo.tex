@@ -276,12 +276,16 @@ BasicDBOBjectBuilder.start().add("username", "bwmcadams").add("password", "Mongo
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Briefly: Working with DBObjects}
+\begin{frame}[fragile]{Briefly: Working with DBObjects}
     Getting data from DBObjects is relatively simple in Java\ldots
     \begin{itemize}
         \item<2-> Check if a field (a.k.a. Key) exists with {\em containsField()}
         \item<3-> Get a {\bf Set<String>} of a {\bf DBObject}'s field names with {\em keySet()}
         \item<4-> Get a specific field with {\em get(String key)}.  This returns {\em Object} so you will need to cast to an expected value.
+\begin{lstlisting}
+// DBObject doc = <some row fetched from MongoDB>
+String username = (String) doc.get("username")
+\end{lstlisting}
         \item<5-> Call {\em toMap()} to get back a {\bf Map} (String, Object) instead.
     \end{itemize}
 \end{frame}
@@ -352,7 +356,7 @@ List values = coll.distinct("postedBy", q);
 \end{frame}
 
 \begin{frame}{MongoDB Querying}{Query Operators}
-     MongoDB is no mere Key-value store. There are myriad powerful operators to enhance your MongoDB queries\ldots
+     MongoDB is no mere Key-Value store. There are myriad powerful operators to enhance your MongoDB queries\ldots
     \begin{itemize}{\small
         \item Conditional Operators: {\bf \$gt} (>), {\bf \$lt} (<), {\bf \$gte (>=)},  {\bf \$lte (<=)}
         \item Negative Equality: {\bf \$ne} (!=) 
@@ -381,7 +385,7 @@ DBObject q = new BasicDBObject("postedBy",
 DBCursor posts = coll.find(q);
 \end{lstlisting}
         \item<4-> No syntactic sugar in Java to make it easier\ldots
-        \item<5-> {\em Mungbean} provides a more fluid query syntax (but isn't very Mongo-ey), if you use it's PoJo mapping.
+        \item<5-> {\em Mungbean} provides a more fluid query syntax (but isn't very Mongo-ey), if you use its PoJo mapping.
         \item<6-> You might also consider evaluating other JVM languages for querying....
 
     \end{itemize}
@@ -430,10 +434,10 @@ posts = coll.find(q)
     \small MongoDB Indexes work much like RDBMS indexes\ldots
     \begin{itemize}
         \item Create a single-key index:\\ 
-            \begin{lstlisting}
+\begin{lstlisting}
 DBObject idx = new BasicDBObject("postedBy", 1);
 coll.createIndex(idx);
-            \end{lstlisting}
+\end{lstlisting}
         This defaults to ascending order (-1 = descending), with a system generated name.
         \item For a multi-key/compound-key index:
             \begin{lstlisting}
@@ -442,7 +446,7 @@ DBObject idx = new BasicDBObjectBuilder.start().
                    add("postDate", -1).
                    get();
 coll.createIndex(idx);
-            \end{lstlisting}
+\end{lstlisting}
         This sorts postedBy ascending, but postDate descending.
 
     \item If you want to index an embedded field, simply use the query dot notation (e.g. "address.city")
@@ -454,13 +458,13 @@ coll.createIndex(idx);
     \small MongoDB Indexes work much like RDBMS indexes\ldots
     \begin{itemize}
     \item You can pass a second DBObject of options to change the type of index, name, etc:
-            \begin{lstlisting}
+\begin{lstlisting}
 DBObject idx = new BasicDBObject("slug", 1);
 DBObject opts = new BasicDBObject("unique": true);
 coll.createIndex(idx, opts);
-            \end{lstlisting}
+\end{lstlisting}
             This will ensure that the "slug" field is unique across all entries.  (A list of complete options is available in the MongoDB Documentation)
-        \item Consider using {\em ensureIndex()} instead of {\em createIndex}.
+        \item Consider using {\em ensureIndex()} instead of {\em createIndex()}.
     \end{itemize}
 \end{frame}
 
@@ -471,7 +475,7 @@ coll.createIndex(idx, opts);
     \begin{itemize}
         \item Map/Reduce (great for more complex aggregation)
         \item Geospatial indexes and queries
-        \item Aggregation queries such as Group (Which use JavaScript functions)
+        \item Aggregation queries such as Grouping statements (Which use JavaScript functions)
         \item Lots more at MongoDB.org \ldots
     \end{itemize}
 \end{frame}

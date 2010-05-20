@@ -1,0 +1,94 @@
+- Intro
+    * Small, simple, constant load site
+    * Keeping costs low is paramount
+    * More users = more load
+    * More load = more hardware
+    * Advertising revenues aren't reliable
+    * Not google - can't afford to think or scale like google
+- Sluggy Rundown
+    * ~50 GB of traffic/day (On a single virtual box)
+    * 12 Years of Comics (~6500 comic files)
+    * Artist frequently is late in updating, so system has to handle random cache flushes and updates
+    * LAMP Stack
+    * No dedicated staff or operations budget - which means operations costs, downtime, bugs, etc must be minimized
+----
+- A Brief History
+    * 1998 - Static HTML, generated with Perl via cron based off image files in a specific directory (glob filenames, still used)
+        + Glob file: 0000217a.gif, 0000217b.gif, 0000217c.gif All represent panels from the same comic.  Artist understands and likes this format. Code looks for <dateFormat>*.(gif|jpg) via glob and organizes in order.
+    * ~2000 - Original Developers formed Keenspot.com using same code & navigation concepts.
+    * ~2002 - Rewrite began using MySQL + PHP to allow for "No more HTML editing". Dynamic site headlines, "members only club" with "behind the scenes" features, custom predefined templates, dynamic chapter navigation.
+        + First folly - reading MySQL and dynamically generating on each page request magnitudes harder than static HTML
+        + Utilized smarty template caching, generate on-disk cache file first request.
+    * ~2006 - Server move for cost reasons introduced new problems
+        - Perceived cost savings pushed a move from SCSI/SAS disks to SATA
+            + Between template files & comic file globs, disks couldn't keep up
+            + Implemented Memcached to cache templates off-disk, and cache glob results. Cache updated no more than once daily - for stuff not likely to change expiry set to a week+ (with code to flush specific items)
+            + Sessions performed poorly in both Disk and MySQL - caching in Memcached helped.
+        - Apache began crushing us on memory & IO.
+            + PHP isn't thread safe, which required forked Apache workers (children are EXPENSIVE)
+            + Migrated to Lighttpd + FastCGI - IO & RAM usage of webserver & PHP negligible.
+    * 2009 - Rewrite in Pylons (Python + SQLAlchemy[MySQL]) 
+        + Integrated Beaker caching decorators (templates & code blocks) simplified adding caching code
+        + Clean ORM model, light & fast with lots of caching
+        + Ran significantly better than PHP - more tunable, sensible and sane.
+        + Memcached continued to become a big, rickety crutch (cascading failure)
+    * Aug. 3, 2009 - New Pylons system went live (v1.0)
+        + Huge amounts of our code (as much as 80%) were dedicated to converting UI Objects to and from Database objects.  WTF?
+        + No more forks - system resources were significantly less taxed.
+    * Aug. 14, 2009 - v1.10 went live, replacing MySQL with MongoDB (and MongoKit)
+        + Easy migration - MongoKit was quickly dropped in place and queries adjusted from SQLAlchemy model (Stuck to MySQL schema as much as possible)
+        + Maintained all bug fixes on MySQL for a few weeks in parallel as a "just in case" (never needed it)
+        + Performance was VASTLY improved. 
+        + Over next few months, built tools to use MongoDB in place of Memcached for caching (mongodb_beaker)
+        + LAMP replaced by LUMP (Linux, Ubuntu, MongoDB + Pylons)
+        + A few things left in Memcached through a combination of "makes sense there" and indolence (open debt task to migrate the rest)
+    * Sept. 2009 - MongoDB completely removed need for Physical hardware - migrated to Virtual Hosting (slicehost)
+        + Average system load is ~.05 on a 2G slice.  
+        + MongoDB uses ~1% of CPU on average.
+        + Switchover took ~2 minutes (ran data conversion script, deployed new code tag, restarted webserver)
+        + No downtime in any way attributable to MongoDB since go live (can't say the same for MySQL)
+----
+- Lessons Learned (Over time)
+    * Memcache can be great for things you can afford to lose.  For anything else it sucks.
+        + Corellary - It's not just what you "can't afford to lose". Beware of cascading Memcached failures.  (Overreliance can cause self-DOSing after a crash or reboot)
+    * MongoDB's MMAP system gives you a "free" MRU cache - done right, caching on MongoDB is durable, light and fast.
+    * Don't build your MongoDB system like a MySQL System (it'll work but you'll lose speed and flexibility)
+        + DBRefs should be used sparingly - favor embedded objects (and autoref comes with a performance penalty).
+    * Flexible Schemas are good.
+        + Wasting your time mapping data back and forth from RBMS' is not just tedious - it is prone to the introduction of errors
+    * The more you can put in memory, the less you beat on your disks
+        + Especially important on virtual hosting - be a good neighbor
+        + MongoDB is very good at automatically memory-caching frequently used data.
+    * While there is a lot "Wrong" with our first pass Mongo implementation, Mongo has run so consistently
+    * *SOMEONE* Has to enforce a consistent schema - if it's not your Database (like an RDBMS does) then your code or your ops people (or both) have to.
+- Open Source Code Spawned
+    * mongodb_beaker 
+        + Open Source caching plugin for the Python Beaker stack.  Caches arbitrary data (e.g. results of methods), templates, sessions, etc.
+        + Uses distutils plugin entry points
+        + Switching from memcache to Beaker required a 2 line config file change:
+- beaker.session.type = libmemcached
+- beaker.session.url = 127.0.0.1:11211
++ beaker.session.type = mongodb
++ beaker.session.url = mongodb://localhost:27017/emergencyPants#sessions
+        + A few limitations on the beaker side which need to be cleaned up (manipulable cache data)
+    * MongoKit-Pylons
+        + Added support to MongoKit to run within a Pylons environment (threadlocal setup of the connection pool)
+        + Added a few other features to simplify migration from SQLAlchemy
+            ~ setattr / getattr to allow {\bf mongoDoc.{\em field}} instead of the dictionary interface ({\bf mongoDoc['{\em field}']})
+            ~ DB Authentication
+            ~ A few missing corners such as additional datatypes, enhanced index definitions, group statement shortcuts, etc.
+        + Integrated support for autoreferences (which are usually a bad idea)
+        + Changes merged into MongoKit Trunk (which has GREAT unit test coverage)
+    
+---
+- Why MongoDB?
+    * Dynamic Querying
+    * Flexibility 
+        + (CouchDB's approach was obtuse and rather unPythonic)
+        + Tools like MongoKit allowed for easy replacement of existing MySQL ORM code with something almost identical
+    * FAST
+    * Great support was available
+        + MongoDB Mailing List
+        + IRC: freenode.net #mongodb
+    * Shiny
+
