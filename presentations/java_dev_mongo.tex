@@ -181,18 +181,18 @@ boolean auth = db.authenticate("login", "password");
     Collections are MongoDB "tables"\dots
     \pause
     \begin{itemize}
-        \item{List all of the collections in a database\dots \\
+        \item List all of the collections in a database\dots \\
 \begin{lstlisting}
 Set<String> = colls = db.getCollectionNames();
 for (String s : colls) {
     System.out.println(s);
 }
 \end{lstlisting}
-        \item{Get a specific collection (lazy)\dots \\
+        \item Get a specific collection (lazy)\dots \\
 \begin{lstlisting}
 DBCollection coll = db.getCollection("testData");
 \end{lstlisting}
-        \item{Count the number of documents in a collection\dots \\
+        \item Count the number of documents in a collection\dots \\
 \begin{lstlisting}
 coll.getCount(); 
 \end{lstlisting}
@@ -271,7 +271,7 @@ BasicDBOBjectBuilder.start().add("username", "bwmcadams").add("password", "Mongo
             \begin{itemize}
                 \item Morphia (uses JPA-style annotations)
                 \item Daybreak (annotation based)
-                \item Mungbean (more Java-ey query syntax & PoJo Mapping)
+                \item Mungbean (more Java-ey query syntax \& PoJo Mapping)
             \end{itemize}
               
     \end{itemize}
