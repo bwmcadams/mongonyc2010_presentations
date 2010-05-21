@@ -25,13 +25,11 @@
 
 \usepackage{hyperref}
 
-
-
 \usepackage{color}
 \usepackage{xcolor}
 \usepackage{listings}
 
-\lstset{language=Java,captionpos=t,tabsize=3,keywordstyle=\color{blue},commentstyle=\color{green},stringstyle=\color{red},numberstyle=\tiny,numbersep=5pt,breaklines=true,showstringspaces=false,basicstyle=\scriptsize,emph={label}}
+\lstset{language=Java,captionpos=t,tabsize=3,keywordstyle=\color{blue},commentstyle=\color{darkgreen},stringstyle=\color{red},numberstyle=\tiny,numbersep=5pt,breaklines=true,showstringspaces=false,basicstyle=\scriptsize,emph={label}}
 
 
 \usepackage{caption}
@@ -59,9 +57,7 @@
 %{Presentation Subtitle} % (optional)
 
 \author[Brendan W. McAdams] 
-{Brendan W. McAdams\\
-%{\scriptsize @rit ({\bf twitter}) }
-}
+{Brendan W. McAdams}
 % - Use the \inst{?} command only if the authors have different
 %   affiliation.
 
@@ -91,7 +87,8 @@
 % the beginning of each subsection:
 \AtBeginSubsection[]
 {
-  \begin{frame}<beamer>{Outline}
+  \begin{frame}<beamer>
+	\frametitle{Outline}
     \tableofcontents[currentsection,currentsubsection]
   \end{frame}
 }
@@ -109,7 +106,8 @@
   \titlepage
 \end{frame}
 
-\begin{frame}{Outline}
+\begin{frame}
+\frametitle{Outline}
   \tableofcontents
   % You might wish to add the option [pausesections]
 \end{frame}
@@ -129,10 +127,10 @@
 
 \subsection[Getting Started]{Setting up your Java environment}
 
-\begin{frame}[fragile]{Adding the MongoDB Driver To Your Project}
- 
+\begin{frame}[fragile]
+\frametitle{Adding the MongoDB Driver To Your Project}
   Assuming you're using a dependency manager, make setup simple\dots
-    \pause
+  \pause
 \begin{lstlisting}[caption=Maven Dependency]
 <dependency>
   <groupId>org.mongodb</groupId>
@@ -150,7 +148,8 @@
 
 \subsection[Connecting to MongoDB]{Connecting to MongoDB}
 
-\begin{frame}[fragile]{Simple Connection}
+\begin{frame}[fragile]
+\frametitle{Simple Connection}
     Getting connected to MongoDB is simple; 
     Connections are pooled, so you only need one\dots\\
 \begin{lstlisting} 
@@ -177,7 +176,8 @@ boolean auth = db.authenticate("login", "password");
 
 \subsection[Collections + Documents]{Collections + Documents}
 
-\begin{frame}[fragile]{Working with Collections}
+\begin{frame}[fragile]
+\frametitle{Working with Collections}
     Collections are MongoDB "tables"\dots
     \pause
     \begin{itemize}
@@ -199,7 +199,9 @@ coll.getCount();
     \end{itemize}
 \end{frame}
 
-\begin{frame}{MongoDB Documents}{BSON}
+\begin{frame}
+\frametitle{MongoDB Documents}
+\framesubtitle{BSON}
     \begin{itemize}
         \item "Documents" are MongoDB's "rows". 
         \item MongoDB's Internal Document representation is '{\bf BSON}'
@@ -214,7 +216,9 @@ coll.getCount();
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{MongoDB Documents}{From Java: BasicDBObject}
+\begin{frame}[fragile]
+\frametitle{MongoDB Documents}
+\framesubtitle{From Java: BasicDBObject}
     \begin{itemize}
         \item Java representation of {\bf BSON} is the map-like {\bf DBObject} (Java 2.0 driver has a new base class of {\bf BSONObject} related to the {\bf BSON} split-off)
         \item Easiest way to work with Mongo Documents is BasicDBObject\dots
@@ -234,7 +238,9 @@ doc.put("password", "MongoNYC");
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{MongoDB Documents}{From Java: BasicDBObjectbuilder}
+\begin{frame}[fragile]
+\frametitle{MongoDB Documents}
+\framesubtitle{From Java: BasicDBObjectBuilder}
     For those who prefer immutability\dots
     \begin{itemize}
         \item {\bf BasicDBObjectBuilder} follows the {\em Builder} pattern.
@@ -254,7 +260,9 @@ BasicDBOBjectBuilder.start().add("username", "bwmcadams").add("password", "Mongo
     \end{itemize}
 \end{frame}
 
-\begin{frame}{MongoDB Documents}{Implementation by Extension: DBObject}
+\begin{frame}
+\frametitle{MongoDB Documents}
+\framesubtitle{Implementation by Extension: DBObject}
     \begin{itemize}
         \item<1-> If you want to create your own concrete objects, extend \& implement {\bf DBObject}
             \begin{itemize}
@@ -277,7 +285,8 @@ BasicDBOBjectBuilder.start().add("username", "bwmcadams").add("password", "Mongo
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Briefly: Working with DBObjects}
+\begin{frame}[fragile]
+\frametitle{Briefly: Working with DBObjects}
     Getting data from DBObjects is relatively simple in Java\ldots
     \begin{itemize}
         \item<2-> Check if a field (a.k.a. Key) exists with {\em containsField()}
@@ -293,7 +302,8 @@ String username = (String) doc.get("username")
 
 \subsection[Inserting Documents to MongoDB]{Inserting Documents to MongoDB}
 
-\begin{frame}[fragile]{Inserting Documents}
+\begin{frame}[fragile]
+\frametitle{Inserting Documents}
     \begin{itemize}
         \item<2-> One at a time:\\
 \begin{lstlisting}
@@ -318,7 +328,9 @@ coll.insert(doc);
 
 \subsection[Querying MongoDB]{Querying MongoDB}
 
-\begin{frame}[fragile]{MongoDB Querying}{Basics}
+\begin{frame}[fragile]
+\frametitle{MongoDB Querying}
+\framesubtitle{Basics}
     \begin{itemize}
         \item Find a single row with {\em findOne()}.  Takes the first row returned.
         \item<2-> Getting a cursor of all documents ({\em find()} with no query):\\ 
@@ -339,7 +351,9 @@ DBObject doc = coll.findOne(q);
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{MongoDB Querying}{Basics}
+\begin{frame}[fragile]
+\frametitle{MongoDB Querying}
+\framesubtitle{Basics}
     \begin{itemize}
         \item You can pass an optional second {\bf DBObject} parameter to {\em find()} and {\em findOne()} which specifies the fields to return. 
         \item If you have an embedded object (for example, an address object) you can retrieve it with dot notation in the fields list (e.g. {\em "address.city"} retrieves just the city value)
@@ -356,7 +370,9 @@ List values = coll.distinct("postedBy", q);
     \end{itemize}
 \end{frame}
 
-\begin{frame}{MongoDB Querying}{Query Operators}
+\begin{frame}
+\frametitle{MongoDB Querying}
+\framesubtitle{Query Operators}
      MongoDB is no mere Key-Value store. There are myriad powerful operators to enhance your MongoDB queries\ldots
     \begin{itemize}{\small
         \item Conditional Operators: {\bf \$gt} (>), {\bf \$lt} (<), {\bf \$gte (>=)},  {\bf \$lte (<=)}
@@ -370,7 +386,9 @@ List values = coll.distinct("postedBy", q);
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{MongoDB Querying}{Putting Operators to Work}
+\begin{frame}[fragile]
+\frametitle{MongoDB Querying}
+\framesubtitle{Putting Operators to Work}
     Using a query operator requires nested objects\ldots
     \begin{itemize}
         \item<2-> All posts since a particular date:\\ \begin{lstlisting}
@@ -394,7 +412,9 @@ DBCursor posts = coll.find(q);
 
 \subsection[Querying MongoDB]{AltJVM Languages - Syntactic Sugar}
 
-\begin{frame}[fragile]{MongoDB Querying}{AltJVM Languages - Syntactic Sugar}
+\begin{frame}[fragile]
+\frametitle{MongoDB Querying}
+\framesubtitle{AltJVM Languages - Syntactic Sugar}
 \begin{semiverbatim}
 \begin{lstlisting}[label=groovy-sample,caption=Groovy Sample]
 def q = [postDate: ["$gte:" new java.util.Date()]
@@ -407,7 +427,9 @@ def posts = coll.find(q)
 \end{semiverbatim}
 \end{frame}
 
-\begin{frame}[fragile]{MongoDB Querying}{AltJVM Languages - Syntactic Sugar}
+\begin{frame}[fragile]
+\frametitle{MongoDB Querying}
+\framesubtitle{AltJVM Languages - Syntactic Sugar}
 \begin{semiverbatim}
 \begin{lstlisting}[label=scala-sample,caption=Scala Sample]
 val q = "postDate" $gte new java.util.Date()
@@ -418,7 +440,9 @@ val posts = coll.find(q)
 \end{semiverbatim}
 \end{frame}
 
-\begin{frame}[fragile]{MongoDB Querying}{AltJVM Languages - Syntactic Sugar}
+\begin{frame}[fragile]
+\frametitle{MongoDB Querying}
+\framesubtitle{AltJVM Languages - Syntactic Sugar}
 \begin{semiverbatim}
 \begin{lstlisting}[label=jython-sample,caption=Jython Sample]
 q = {"postDate": {"$gte": datetime.datetime.now()}}
@@ -431,7 +455,8 @@ posts = coll.find(q)
 
 \subsection[More Advanced MongoDB]{Indexes, etc}
 
-\begin{frame}[fragile]{Indexes}
+\begin{frame}[fragile]
+\frametitle{Indexes}
     \small MongoDB Indexes work much like RDBMS indexes\ldots
     \begin{itemize}
         \item Create a single-key index:\\ 
@@ -450,12 +475,14 @@ coll.createIndex(idx);
 \end{lstlisting}
         This sorts postedBy ascending, but postDate descending.
 
-    \item If you want to index an embedded field, simply use the query dot notation (e.g. "address.city")
+    \item If you want to index an embedded field, simply use the query dot notation (e.g. ``address.city'')
         
     \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Indexes}{Options}
+\begin{frame}[fragile]
+\frametitle{Indexes}
+\framesubtitle{Options}
     \small MongoDB Indexes work much like RDBMS indexes\ldots
     \begin{itemize}
     \item You can pass a second DBObject of options to change the type of index, name, etc:
@@ -471,7 +498,8 @@ coll.createIndex(idx, opts);
 
 
 \section{Final Remarks}
-\begin{frame}{Things We Didn't Cover}
+\begin{frame}
+\frametitle{Things We Didn't Cover}
     Things we didn't cover, but you should spend some time exploring\ldots
     \begin{itemize}
         \item Map/Reduce (great for more complex aggregation)
